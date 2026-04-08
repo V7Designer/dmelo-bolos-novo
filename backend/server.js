@@ -17,8 +17,9 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // CONEXÃO COM SUPABASE
 const pool = new Pool({
-    connectionString: 'postgresql://postgres:%40DMELO%402024@db.tziekmcnjiluwkxqxlpe.supabase.co:5432/postgres',
-    ssl: { rejectUnauthorized: false }
+    connectionString: process.env.DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+    family: 4  // Força IPv4
 });
 
 // Criar tabelas automaticamente
