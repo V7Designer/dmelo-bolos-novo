@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D'Melo - Bolos & Tortas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Header */
+        .header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: fixed; width: 100%; top: 0; z-index: 1000; }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 1rem 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo i { color: #e74c3c; font-size: 2rem; }
+        .logo h2 { color: #2c3e50; }
+        .nav-menu { display: flex; list-style: none; gap: 2rem; }
+        .nav-link { text-decoration: none; color: #333; font-weight: 500; transition: color 0.3s; }
+        .nav-link:hover { color: #e74c3c; }
+        .hamburger { display: none; flex-direction: column; cursor: pointer; }
+        .hamburger span { width: 25px; height: 3px; background: #333; margin: 3px 0; }
+        
+        /* Hero */
+        .hero { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 120px 0 80px; text-align: center; }
+        .hero-title { font-size: 3.5rem; margin-bottom: 1rem; }
+        .hero-subtitle { font-size: 1.3rem; margin-bottom: 2rem; }
+        .rating { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 2rem; }
+        .rating i { color: #f39c12; }
+        .cta-button { display: inline-block; background: #fff; color: #e74c3c; padding: 15px 40px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: transform 0.3s; }
+        .cta-button:hover { transform: translateY(-3px); }
+        
+        /* Sections */
+        .menu-section, .reviews-section, .about-section, .contact-section, .services-section { padding: 80px 0; }
+        .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 3rem; color: #2c3e50; }
+        
+        /* Menu Grid */
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .menu-item { background: #fff; border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; transition: transform 0.3s; }
+        .menu-item:hover { transform: translateY(-10px); }
+        .menu-item img { width: 100%; height: 200px; object-fit: cover; border-radius: 15px; margin-bottom: 1rem; }
+        .menu-item h3 { font-size: 1.5rem; color: #2c3e50; }
+        .price { font-size: 1.5rem; font-weight: 700; color: #e74c3c; margin-top: 1rem; }
+        
+        /* Reviews */
+        .reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem; }
+        .review-item { background: #fff; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .review-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .review-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #e74c3c, #c0392b); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; }
+        .review-stars { color: #f39c12; }
+        
+        /* Services */
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem; }
+        .service-card { background: #f8f9fa; border-radius: 20px; padding: 2rem; text-align: center; transition: transform 0.3s; }
+        .service-card:hover { transform: translateY(-5px); }
+        .service-icon { width: 70px; height: 70px; background: linear-gradient(135deg, #e74c3c, #c0392b); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; }
+        .service-icon i { font-size: 2rem; color: white; }
+        .service-list { list-style: none; text-align: left; }
+        .service-list li { padding: 0.5rem 0; display: flex; align-items: center; gap: 10px; }
+        .service-list li i { color: #27ae60; }
+        
+        /* Contact */
+        .contact-form { max-width: 600px; margin: 0 auto; }
+        .form-group input, .form-group textarea { width: 100%; padding: 15px; border: 2px solid #ecf0f1; border-radius: 10px; font-size: 1rem; margin-bottom: 1.5rem; }
+        .submit-btn { width: 100%; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; padding: 18px; border: none; border-radius: 10px; font-size: 1.2rem; font-weight: 600; cursor: pointer; }
+        
+        /* Footer */
+        .footer { background: #2c3e50; color: white; padding: 3rem 0 1rem; }
+        .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .footer-section h4 { color: #e74c3c; margin-bottom: 1rem; }
+        .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid #34495e; }
+        
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .nav-menu { position: fixed; left: -100%; top: 70px; flex-direction: column; background: white; width: 100%; text-align: center; transition: 0.3s; padding: 2rem 0; }
+            .nav-menu.active { left: 0; }
+            .hero-title { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-birthday-cake"></i>
+                    <h2>D'Melo Bolos & Tortas</h2>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="#home" class="nav-link">Início</a></li>
+                    <li><a href="#menu" class="nav-link">Cardápio</a></li>
+                    <li><a href="#avaliacoes" class="nav-link">Avaliações</a></li>
+                    <li><a href="#sobre" class="nav-link">Sobre</a></li>
+                    <li><a href="#servicos" class="nav-link">Serviços</a></li>
+                    <li><a href="#contato" class="nav-link">Contato</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Os Melhores Bolos da Região</h1>
+            <p class="hero-subtitle">Desde 2015 servindo qualidade e sabor em Areial-PB</p>
+            <div class="rating">
+                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                <span>5.0 (4 avaliações)</span>
+            </div>
+            <a href="#menu" class="cta-button">Ver Cardápio</a>
+        </div>
+    </section>
+
+    <section id="menu" class="menu-section">
+        <div class="container">
+            <h2 class="section-title">Destaques do Cardápio</h2>
+            <div class="menu-grid" id="menu-grid">Carregando...</div>
+        </div>
+    </section>
+
+    <section id="avaliacoes" class="reviews-section">
+        <div class="container">
+            <h2 class="section-title">O que dizem nossos clientes</h2>
+            <div class="reviews-grid" id="reviews-grid">Carregando...</div>
+        </div>
+    </section>
+
+    <section id="sobre" class="about-section">
+        <div class="container">
+            <div class="about-content">
+                <h2 style="text-align:center">Sobre a D'Melo</h2>
+                <p style="text-align:center; max-width:800px; margin:0 auto">Trabalhando desde 2015 sempre servindo os melhores bolos da região. Qualidade não tem preço!!</p>
+                <div style="display:flex; justify-content:center; gap:2rem; margin-top:2rem; flex-wrap:wrap">
+                    <div><i class="fas fa-clock"></i> Aberto até 19:00</div>
+                    <div><i class="fas fa-map-marker-alt"></i> PB-121, 937, Areial-PB</div>
+                    <div><i class="fas fa-phone"></i> (83) 98897-1390</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="servicos" class="services-section">
+        <div class="container">
+            <h2 class="section-title">Informações e Serviços</h2>
+            <div class="services-grid">
+                <div class="service-card"><div class="service-icon"><i class="fas fa-utensils"></i></div><h3>Opções de Serviço</h3><ul class="service-list"><li><i class="fas fa-check-circle"></i> Refeição no local</li></ul></div>
+                <div class="service-card"><div class="service-icon"><i class="fas fa-mug-hot"></i></div><h3>Opções no Menu</h3><ul class="service-list"><li><i class="fas fa-check-circle"></i> Café</li><li><i class="fas fa-check-circle"></i> Refeição rápida</li></ul></div>
+                <div class="service-card"><div class="service-icon"><i class="fas fa-store"></i></div><h3>Ambiente</h3><ul class="service-list"><li><i class="fas fa-check-circle"></i> Casual</li><li><i class="fas fa-check-circle"></i> Tendência</li><li><i class="fas fa-check-circle"></i> Tranquilo</li></ul></div>
+                <div class="service-card"><div class="service-icon"><i class="fas fa-credit-card"></i></div><h3>Pagamentos</h3><ul class="service-list"><li><i class="fas fa-check-circle"></i> Cartão de débito</li></ul></div>
+                <div class="service-card"><div class="service-icon"><i class="fas fa-child"></i></div><h3>Crianças</h3><ul class="service-list"><li><i class="fas fa-check-circle"></i> Bom para ir com crianças</li></ul></div>
+                <div class="service-card"><div class="service-icon"><i class="fas fa-parking"></i></div><h3>Estacionamento</h3><ul class="service-list"><li><i class="fas fa-check-circle"></i> Estacionamento gratuito na rua</li></ul></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contato" class="contact-section">
+        <div class="container">
+            <h2 class="section-title">Faça seu Pedido</h2>
+            <form id="contact-form" class="contact-form">
+                <div class="form-group"><input type="text" id="name" placeholder="Seu nome" required></div>
+                <div class="form-group"><input type="tel" id="phone" placeholder="Seu telefone" required></div>
+                <div class="form-group"><textarea id="message" placeholder="Seu pedido ou mensagem" rows="4" required></textarea></div>
+                <button type="submit" class="submit-btn">Enviar Pedido</button>
+            </form>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section"><h3>D'Melo Bolos & Tortas</h3><p>Os melhores bolos de Areial-PB desde 2015</p></div>
+                <div class="footer-section"><h4>Contato</h4><p><i class="fas fa-phone"></i> (83) 98897-1390</p><p><i class="fas fa-map-marker-alt"></i> PB-121, 937, Areial-PB</p></div>
+                <div class="footer-section"><h4>Horário</h4><p>Segunda a Sábado</p><p>09:00 - 19:00</p></div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2024 D'Melo Bolos & Tortas. Todos os direitos reservados.</p></div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+        hamburger?.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+        document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', () => {
+            hamburger?.classList.remove('active');
+            navMenu?.classList.remove('active');
+        }));
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target?.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Carregar dados
+        async function loadData() {
+            try {
+                const menuRes = await fetch('/api/menu');
+                const menu = await menuRes.json();
+                document.getElementById('menu-grid').innerHTML = menu.map(item => `
+                    <div class="menu-item">
+                        <img src="${item.imagem}" alt="${item.nome}" onerror="this.src='https://via.placeholder.com/300x200'">
+                        <h3>${item.nome}</h3>
+                        <p>${item.descricao}</p>
+                        <div class="price">${item.preco}</div>
+                    </div>
+                `).join('');
+
+                const reviewsRes = await fetch('/api/reviews');
+                const reviews = await reviewsRes.json();
+                document.getElementById('reviews-grid').innerHTML = reviews.map(review => `
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="review-avatar">${review.nome.charAt(0)}</div>
+                            <div><h4>${review.nome}</h4><div class="review-stars">${'⭐'.repeat(review.rating)}</div></div>
+                        </div>
+                        <p>${review.texto}</p>
+                    </div>
+                `).join('');
+            } catch(err) {
+                console.error('Erro:', err);
+            }
+        }
+        loadData();
+
+        // Formulário
+        document.getElementById('contact-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('name').value;
+            const telefone = document.getElementById('phone').value;
+            const mensagem = document.getElementById('message').value;
+            
+            await fetch('/api/pedidos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cliente_nome: nome, cliente_telefone: telefone, pedido: mensagem })
+            });
+            
+            window.open(`https://wa.me/5583988971390?text=Olá! Meu nome é ${nome}. Telefone: ${telefone}. Pedido: ${mensagem}`, '_blank');
+            alert('Pedido enviado!');
+            e.target.reset();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - D'Melo Bolos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
+        .login-container { max-width: 400px; margin: 100px auto; padding: 40px; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .login-container h2 { text-align: center; color: #e74c3c; margin-bottom: 30px; }
+        .login-container input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ecf0f1; border-radius: 10px; }
+        .login-container button { width: 100%; padding: 12px; background: #e74c3c; color: white; border: none; border-radius: 10px; cursor: pointer; }
+        .dashboard { display: none; }
+        .admin-header { background: #2c3e50; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 15px; text-align: center; }
+        .stat-card .number { font-size: 32px; font-weight: bold; color: #e74c3c; }
+        .tabs { display: flex; gap: 10px; padding: 20px; background: white; margin: 20px; border-radius: 15px; }
+        .tab { padding: 10px 20px; background: #ecf0f1; border: none; cursor: pointer; border-radius: 10px; }
+        .tab.active { background: #e74c3c; color: white; }
+        .tab-content { display: none; padding: 20px; background: white; margin: 20px; border-radius: 15px; }
+        .tab-content.active { display: block; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ecf0f1; }
+        .btn { padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; margin: 2px; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-primary { background: #3498db; color: white; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 500px; max-width: 90%; }
+        .modal-content input, .modal-content textarea { width: 100%; padding: 10px; margin: 10px 0; border: 2px solid #ecf0f1; border-radius: 10px; }
+        .logout-btn { background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="login" class="login-container">
+        <h2><i class="fas fa-cake"></i> Painel Admin</h2>
+        <input type="text" id="username" placeholder="Usuário" value="admin">
+        <input type="password" id="password" placeholder="Senha" value="admin123">
+        <button onclick="login()">Entrar</button>
+    </div>
+
+    <div id="dashboard" class="dashboard">
+        <div class="admin-header">
+            <h2>D'Melo Bolos - Admin</h2>
+            <button class="logout-btn" onclick="logout()">Sair</button>
+        </div>
+        <div class="stats" id="stats"></div>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('produtos')">Produtos</button>
+            <button class="tab" onclick="showTab('pedidos')">Pedidos</button>
+        </div>
+        <div id="produtos" class="tab-content active">
+            <button class="btn btn-primary" onclick="openModal()">+ Novo Produto</button>
+            <table id="produtos-table"><thead><tr><th>ID</th><th>Nome</th><th>Preço</th><th>Ações</th></tr></thead><tbody></tbody></table>
+        </div>
+        <div id="pedidos" class="tab-content">
+            <table id="pedidos-table"><thead><tr><th>ID</th><th>Cliente</th><th>Telefone</th><th>Pedido</th><th>Status</th></tr></thead><tbody></tbody></table>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Novo Produto</h3>
+            <input type="hidden" id="produto-id">
+            <input type="text" id="produto-nome" placeholder="Nome">
+            <textarea id="produto-descricao" placeholder="Descrição"></textarea>
+            <input type="text" id="produto-preco" placeholder="Preço (ex: R$ 45,00)">
+            <input type="text" id="produto-imagem" placeholder="URL da imagem">
+            <label><input type="checkbox" id="produto-destaque"> Destaque</label>
+            <br><br>
+            <button onclick="salvarProduto()">Salvar</button>
+            <button onclick="closeModal()">Cancelar</button>
+        </div>
+    </div>
+
+    <script>
+        let token = '';
+        let produtos = [];
+
+        async function login() {
+            const res = await fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: document.getElementById('username').value, password: document.getElementById('password').value })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                token = data.token;
+                localStorage.setItem('token', token);
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadDashboard();
+            } else alert('Erro no login');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            token = '';
+            document.getElementById('login').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+        }
+
+        async function loadDashboard() {
+            const savedToken = localStorage.getItem('token');
+            if (savedToken) token = savedToken;
+            if (!token) return;
+
+            const statsRes = await fetch('/api/admin/stats', { headers: { 'Authorization': `Bearer ${token}` } });
+            const stats = await statsRes.json();
+            document.getElementById('stats').innerHTML = `
+                <div class="stat-card"><h3>Produtos</h3><div class="number">${stats.totalProdutos}</div></div>
+                <div class="stat-card"><h3>Pedidos Pendentes</h3><div class="number">${stats.pedidosPendentes}</div></div>
+                <div class="stat-card"><h3>Média Avaliações</h3><div class="number">⭐ ${stats.mediaAvaliacoes}</div></div>
+            `;
+
+            const produtosRes = await fetch('/api/admin/produtos', { headers: { 'Authorization': `Bearer ${token}` } });
+            produtos = await produtosRes.json();
+            document.querySelector('#produtos-table tbody').innerHTML = produtos.map(p => `
+                <tr><td>${p.id}</td><td>${p.nome}</td><td>${p.preco}</td>
+                <td><button class="btn btn-primary" onclick="editarProduto(${p.id})">✏️</button>
+                <button class="btn btn-danger" onclick="deletarProduto(${p.id})">🗑️</button></td></tr>
+            `).join('');
+
+            const pedidosRes = await fetch('/api/admin/pedidos', { headers: { 'Authorization': `Bearer ${token}` } });
+            const pedidos = await pedidosRes.json();
+            document.querySelector('#pedidos-table tbody').innerHTML = pedidos.map(p => `
+                <tr><td>${p.id}</td><td>${p.cliente_nome}</td><td>${p.cliente_telefone}</td><td>${p.pedido}</td>
+                <td><select onchange="atualizarStatus(${p.id}, this.value)">
+                    <option value="pendente" ${p.status==='pendente'?'selected':''}>Pendente</option>
+                    <option value="preparando" ${p.status==='preparando'?'selected':''}>Preparando</option>
+                    <option value="entregue" ${p.status==='entregue'?'selected':''}>Entregue</option>
+                </select></td></tr>
+            `).join('');
+        }
+
+        function editarProduto(id) {
+            const p = produtos.find(x => x.id == id);
+            document.getElementById('modal-title').innerText = 'Editar Produto';
+            document.getElementById('produto-id').value = p.id;
+            document.getElementById('produto-nome').value = p.nome;
+            document.getElementById('produto-descricao').value = p.descricao;
+            document.getElementById('produto-preco').value = p.preco;
+            document.getElementById('produto-imagem').value = p.imagem;
+            document.getElementById('produto-destaque').checked = p.destaque == 1;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function openModal() {
+            document.getElementById('modal-title').innerText = 'Novo Produto';
+            document.getElementById('produto-id').value = '';
+            document.getElementById('produto-nome').value = '';
+            document.getElementById('produto-descricao').value = '';
+            document.getElementById('produto-preco').value = '';
+            document.getElementById('produto-imagem').value = '';
+            document.getElementById('produto-destaque').checked = false;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+        async function salvarProduto() {
+            const id = document.getElementById('produto-id').value;
+            const produto = {
+                nome: document.getElementById('produto-nome').value,
+                descricao: document.getElementById('produto-descricao').value,
+                preco: document.getElementById('produto-preco').value,
+                imagem: document.getElementById('produto-imagem').value,
+                destaque: document.getElementById('produto-destaque').checked ? 1 : 0
+            };
+            const url = id ? `/api/admin/produtos/${id}` : '/api/admin/produtos';
+            const method = id ? 'PUT' : 'POST';
+            await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(produto) });
+            closeModal();
+            loadDashboard();
+        }
+
+        async function deletarProduto(id) {
+            if (confirm('Excluir produto?')) {
+                await fetch(`/api/admin/produtos/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                loadDashboard();
+            }
+        }
+
+        async function atualizarStatus(id, status) {
+            await fetch(`/api/admin/pedidos/${id}/status`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ status }) });
+            loadDashboard();
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        const savedToken = localStorage.getItem('token');
+        if (savedToken) { token = savedToken; document.getElementById('login').style.display = 'none'; document.getElementById('dashboard').style.display = 'block'; loadDashboard(); }
+    </script>
+</body>
+</html>
