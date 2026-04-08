@@ -52,11 +52,26 @@ db.serialize(() => {
   )`);
 
   // Tabela admin
-  db.run(`CREATE TABLE IF NOT EXISTS admin (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL
-  )`);
+// Criar usuário admin (garantir que existe)
+db.get("SELECT COUNT(*) as count FROM admin", (err, row) => {
+    if (err) {
+        console.error('Erro ao verificar admin:', err);
+        return;
+    }
+    if (row.count === 0) {
+        const bcrypt = require('bcryptjs');
+        const hashedPassword = bcrypt.hashSync('admin123', 10);
+        db.run("INSERT INTO admin (username, password) VALUES (?, ?)", 
+            ['admin', hashedPassword], 
+            (err) => {
+                if (err) console.error('Erro ao criar admin:', err);
+                else console.log('✅ Usuário admin criado: admin / admin123');
+            }
+        );
+    } else {
+        console.log('✅ Usuário admin já existe');
+    }
+});
 
   // Inserir dados iniciais
   db.get("SELECT COUNT(*) as count FROM produtos", (err, row) => {
